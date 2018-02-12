@@ -33,7 +33,7 @@ class RawEnvironment implements Environment
             $finalQueries[$index] = str_replace('@KEY', $key, $query);
         }
 
-        $this->addRawQueries('RAW', $queries);
+        $this->addRawQueries('RAW', $finalQueries);
 
         return array();
     }
@@ -46,9 +46,9 @@ class RawEnvironment implements Environment
 
     public function printRaw($data)
     {
-        foreach ($data as $index => $queries) {
-            foreach ($queries as $query) {
-                echo "\n" . $query;
+        foreach ($data as $index => $rows) {
+            foreach ($rows as $row) {
+                print_r($row);
             }
         }
     }

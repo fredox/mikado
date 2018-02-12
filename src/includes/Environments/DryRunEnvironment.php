@@ -6,12 +6,17 @@ class DryRunEnvironment implements Environment
 	public $filePath;
 	public $fileAppend;
 	public $rawQueries;
+	public $output;
 
-	public function __construct($name, $filePath, $fileAppend)
+	const DRY_RUN_ENVIRONMENT_OUTPUT_FILE = 'file';
+	const DRY_RUN_ENVIRONMENT_SCREEN = 'screen';
+
+	public function __construct($name, $filePath, $fileAppend, $output)
 	{
 		$this->name       = $name;
 		$this->filePath   = $filePath;
 		$this->fileAppend = $fileAppend;
+		$this->output     = $output;
 	}
 
 	public function getName()
@@ -55,7 +60,7 @@ class DryRunEnvironment implements Environment
 	{
 	    if (!$this->fileAppend) {
             echo "\n [DRY-RUN] Cleaning dry run file: " . $this->filePath;
-            file_put_contents($this->filePath, "");
+            $this->saveInFile("", false);
         }
 
         echo "\n [DRY-RUN] Saving data transfer into file: " . $this->filePath;
@@ -64,9 +69,10 @@ class DryRunEnvironment implements Environment
             foreach ($this->rawQueries as $descriptor => $rQueries) {
                 $msg = " [DRY-RUN][RAW QUERIES] " . $descriptor;
                 echo "\n" . $msg;
-                file_put_contents($this->filePath, "\n" . '--' . $msg, FILE_APPEND);
+                $this->saveInFile("\n" . '--' . $msg);
                 foreach ($rQueries as $rQuery) {
-                    file_put_contents($this->filePath, "\n" . $rQuery, FILE_APPEND);
+                    echo "\n [DRY-RUN][RAW QUERIES] Saving raw queries in " . $this->filePath;
+                    $this->saveInFile("\n" . $rQuery);
                 }
             }
         } else {
@@ -74,15 +80,15 @@ class DryRunEnvironment implements Environment
         }
 
         if (empty($data)) {
-            echo "\n [DRY-RUN][WARNING] Empty data set";
-            file_put_contents($this->filePath, " -- No data found");
+            echo "\n [DRY-RUN][WARNING] Empty regular data set";
+            $this->saveInFile("\n -- No Regular data found");
             return;
         }
 
         foreach ($data as $index => $queries) {
             $msgTable =  "\n -- [" . $index . "] to environment [" . $this->name . "]";
             echo $msgTable;
-            file_put_contents($this->filePath, "\n" . $msgTable, FILE_APPEND);
+            $this->saveInFile("\n" . $msgTable);
 
             if (empty($queries)) {
                 echo "\n [DRY-RUN][WARNING] Empty data set [" . $index . "]";
@@ -90,11 +96,22 @@ class DryRunEnvironment implements Environment
             }
 
             foreach ($queries as $query) {
-                file_put_contents($this->filePath, "\n" . $query, FILE_APPEND);
+                $this->saveInFile("\n" . $query);
             }
 
         }
 	}
+
+	public function saveInFile($data, $fileAppend=true)
+    {
+        if ($this->output == self::DRY_RUN_ENVIRONMENT_OUTPUT_FILE) {
+            $fileAppend = ($fileAppend) ? FILE_APPEND : 0;
+            file_put_contents($this->filePath, $data, $fileAppend);
+        } else {
+            echo "\n" . $data;
+        }
+
+    }
 
 	public function describe($dataIndex)
     {

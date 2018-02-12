@@ -30,10 +30,14 @@ class EnvironmentFactory
 				);
 				break;
 			case 'dryrun':
+			    $output = (array_key_exists('output', $environmentConfig)) ?
+                    $environmentConfig['output']
+                    : DryRunEnvironment::DRY_RUN_ENVIRONMENT_OUTPUT_FILE;
 				return new DryRunEnvironment(
 					$environmentConfig['name'],
 					$environmentConfig['filePath'],
-                    $environmentConfig['fileAppend']
+                    $environmentConfig['fileAppend'],
+                    $output
 				);
 				break;
             case 'keyfile':

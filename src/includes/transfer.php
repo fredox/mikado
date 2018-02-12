@@ -7,6 +7,7 @@ require_once('Monad/MysqlToDryrunMonad.php');
 require_once('Monad/MysqlToMysqlMonad.php');
 require_once('Monad/DryrunToMysqlMonad.php');
 require_once('Monad/RawToDryrunMonad.php');
+require_once('Monad/RawToMysqlMonad.php');
 
 function transfer($sourceEnvironment, $targetEnvironment, $queries, $key, $config)
 {

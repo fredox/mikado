@@ -25,6 +25,12 @@ $config = array(
             'filePath'    => 'io/sakila-dry-run.sql',
             'fileAppend'  => false
         ),
+        'screen' => array(
+            'type'        => 'dryrun',
+            'filePath'    => 'io/sakila-dry-run.sql',
+            'fileAppend'  => false,
+            'output'      => 'screen'
+        ),
         'raw' => array(
             'type'          => 'raw',
             'putOperation'  => 'printRaw'

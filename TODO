@@ -1,4 +1,3 @@
-- Fix Raw environment
 - Add namespaces
 - Create class for output, with levels of verbosity
 - Add unit tests
