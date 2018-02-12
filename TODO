@@ -1,0 +1,11 @@
+- Fix Raw environment
+- Add namespaces
+- Create class for output, with levels of verbosity
+- Add unit tests
+- Improve Inserts performance with multiple values per insert
+- Add functional tests
+- Add better error handling strategy
+- Add the possibility to download config from github repo on the fly
+- Add more types of environments: web-service, screen, no-sql-databases, ftp, csv, sqlite, etc.
+- Add more transformations for manipulate dates, filters, etc.
+- Add more hooks: send-mail, report, check-data-integrity, etc.

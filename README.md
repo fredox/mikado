@@ -1,2 +1,2 @@
-# mikado
-moving data tool
+# MIKADO locomotive
+A *guerrilla* script for move data between environments

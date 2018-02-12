@@ -1,0 +1,4 @@
+-- Comment
+cfg:sakila::actor-keys sakila-a actor.keys _ -hello
+
+cfg:sakila::actor:byId sakila-a -replace dry-run actor.keys
