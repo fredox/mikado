@@ -48,6 +48,12 @@ class InputHelp {
             echo "\n\n";
             exit;
         }
+
+        if (preg_match("/^cfg:([^\s]+):([^\s]+) ?$/", $commandArgs, $matches)) {
+            static::showConfigEnvironments($matches[1]);
+            echo "\n\n";
+            exit;
+        }
     }
 
     public static function showConfigFolders()
@@ -82,6 +88,10 @@ class InputHelp {
         echo "\n [HELP] Available Environments:\n";
 
         foreach ($config['environments'] as $environmentName => $environment) {
+            if (!array_key_exists('type', $environment)) {
+                echo "\n [ERROR] Environment type is not set for: [". $environmentName ."]\n\n";
+                exit;
+            }
             echo "\n  - " . $environmentName . ' (type:' . $environment['type'] . ')';
         }
     }
@@ -101,8 +111,8 @@ class InputHelp {
 
         include_once('config/' . $configPath . '/config.php');
 
-        if (!$config['groups']) {
-            echo "\n [ERROR] groups key it is not set on default config.\n\n";
+        if ((!array_key_exists('groups', $config)) || !$config['groups']) {
+            echo "\n [ERROR] groups key it is not set on config [". $configPath ."]\n\n";
             exit;
         }
 

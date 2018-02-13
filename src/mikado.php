@@ -192,6 +192,11 @@ class Mikado {
 
     public static function getKeys($key, $config)
     {
+        if (!array_key_exists('compact-mode', $config)) {
+            echo "\n[ERROR] You must define compact-mode in config.\n\n";
+            exit;
+        }
+
         if ($config['compact-mode'] === false) {
             $key = explode(',', $key);
         } else {
