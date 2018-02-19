@@ -47,10 +47,14 @@ class EnvironmentFactory
                 $fileAppend = array_key_exists('fileAppend', $environmentConfig) ?
                     $environmentConfig['fileAppend']
                     : false;
+                $defaultValue =  array_key_exists('default', $environmentConfig) ?
+                    $environmentConfig['default']
+                    : null;
                 return new KeyFileEnvironment(
                     $environmentConfig['name'],
                     $keyField,
-                    $fileAppend
+                    $fileAppend,
+                    $defaultValue
                 );
             case 'raw':
                 return new RawEnvironment(

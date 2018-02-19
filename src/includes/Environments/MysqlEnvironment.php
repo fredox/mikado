@@ -14,6 +14,7 @@ class MysqlEnvironment implements Environment
 	public $socket = null;
 	public $rawQueries = array();
 	public static $cachedConnections = array();
+	public static $savedPrimaryKeys = array();
 
 	public $connection;
 
@@ -54,6 +55,8 @@ class MysqlEnvironment implements Environment
         }
 
         $this->connection = $connection;
+
+        echo "\n [IN MEMORY PRIMARY KEYS] " . implode(",", array_keys(static::$savedPrimaryKeys));
     }
 
     public function addRawQueries($descriptor, $queries)
@@ -107,21 +110,71 @@ class MysqlEnvironment implements Environment
     {
     	$finalResult = array();
 
-    	foreach ($queries as $tableName => $query) {
+    	foreach ($queries as $tableNameIndex => $query) {
+    	    if (empty($query)) {
+    	        echo "\n [WARNING][". $this->name ."] Empty query for [" . $tableNameIndex . "]";
+            }
+
             $query = str_replace('@KEY', $key, $query);
-            list($tableName, $comment) = $this->getRealTableName($tableName);
+    	    $query = $this->replaceSavedPrimaryKeys($query);
+    	    // echo "\n\n" . $query . "\n\n";
+            list($tableName, $comment) = $this->getRealTableName($tableNameIndex);
             echo "\n [i][". $this->name ."] collecting data from [" . $tableName . $comment . "]";
     		$result = $this->query($query, true);
-    		echo "  (". count($result) .") rows";
 
     		if (empty($result)) {
     		    echo "\n [i][". $this->name ."][WARNING] Not found results in table [" . $tableName . "]";
             } else {
+    		    echo "\n [MYSQL ENVIRONMENT][SAVING PRIMARY KEYS]";
+                $this->savePrimaryKeys($tableName, $tableNameIndex, $result);
+                echo "  (". count($result) .") rows";
     		    $finalResult[$tableName] = $result;
             }
     	}
 
     	return $finalResult;
+    }
+
+    public function replaceSavedPrimaryKeys($query)
+    {
+        foreach (static::$savedPrimaryKeys as $tableNameIndex => $rows) {
+            if (is_numeric(static::$savedPrimaryKeys[$tableNameIndex][0])) {
+                $replacement = implode(',', static::$savedPrimaryKeys[$tableNameIndex]);
+            } else {
+                $replacement = '"' . str_replace(',', '","', implode(',', static::$savedPrimaryKeys[$tableNameIndex]));
+            }
+
+            $query = str_replace('#' . $tableNameIndex, $replacement, $query);
+        }
+
+        return $query;
+    }
+
+    public function savePrimaryKeys($tableName, $tableNameIndex, $dataRows)
+    {
+        // If there is only one column the keys become this column.
+        if (count(current($dataRows)) == 1) {
+            $sample = array_keys(current($dataRows));
+            $primaryKeyField = array_shift($sample);
+            static::$savedPrimaryKeys[$tableNameIndex] = array_column($dataRows, $primaryKeyField);
+            return;
+        }
+
+        $fieldsDescription = $this->describe($tableName);
+        $primaryKeyField   = false;
+
+        foreach ($fieldsDescription as $fieldName => $fieldDescription) {
+            if ($fieldDescription['key'] == 'PRI') {
+                $primaryKeyField = $fieldName;
+                break;
+            }
+        }
+
+        if (!$primaryKeyField) {
+            return;
+        }
+
+        static::$savedPrimaryKeys[$tableNameIndex] = array_column($dataRows, $primaryKeyField);
     }
 
     public function getRealTableName($tableName)

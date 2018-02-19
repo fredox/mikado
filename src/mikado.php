@@ -24,6 +24,29 @@ class Mikado {
         }
     }
 
+    public static function checkConfig($config, $queries, $configPath)
+    {
+        if (empty($config)) {
+            echo "\n [ERROR] Config file is empty: " . $configPath . "/config.php\n";
+            exit;
+        }
+
+        foreach ($config['groups-to-import'] as $group) {
+
+            if (!array_key_exists($group, $config['groups'])) {
+                echo "\n [ERROR] " . $group . " does not exist as index in groups config\n";
+                exit;
+            }
+
+            foreach ($config['groups'][$group] as $queryIndex) {
+                if (!array_key_exists($queryIndex, $queries)) {
+                    echo "\n [ERROR] " . $queryIndex . " does not exist as index in query files\n";
+                    exit;
+                }
+            }
+        }
+    }
+
     public static function run($args)
     {
         list($configPath, $customGroupTag, $params) = static::getConfigPath($args);
@@ -34,16 +57,14 @@ class Mikado {
 
         require($configPath . '/config.php');
 
-        if (empty($config)) {
-            echo "\n[ERROR] Config file is empty: " . $configPath . "/config.php\n";
-            exit;
-        }
-
-        echo "\n[QUERIES FILE] " . $config['queries-file'];
-
         $config = static::getGroupsToImport($customGroupTag, $config);
 
         require($config['queries-file']);
+
+        static::checkConfig($config, $queries, $configPath);
+
+        echo "\n[QUERIES FILE] " . $config['queries-file'];
+
         require_once('hooks.php');
         require_once('includes/transfer.php');
         require_once('includes/Input.php');
@@ -122,13 +143,13 @@ class Mikado {
         }
 
         if ($customGroupTags['type'] == 'custom-group') {
-            echo " \n[INFO] Selecting cutom group";
+            echo " \n[INFO] Selecting custom group";
             $config['groups-to-import'] = explode(',', $customGroupTags['value']);
             return $config;
         }
 
         if ($customGroupTags['type'] == 'custom-tmp-group') {
-            echo " \n[INFO] Creating cutom group on the fly [" . $customGroupTags['value'] . "]";
+            echo " \n[INFO] Creating custom group on the fly [" . $customGroupTags['value'] . "]";
             $tmpGroupName = 'tmp-' . str_replace(',', '-', $customGroupTags['value']);
             $config['groups'][$tmpGroupName] = explode(',', $customGroupTags['value']);
             $config['groups-to-import'] = array($tmpGroupName);

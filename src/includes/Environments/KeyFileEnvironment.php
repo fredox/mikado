@@ -9,12 +9,14 @@ class KeyFileEnvironment implements Environment
     public $filePath;
     public $keyField;
     public $fileAppend;
+    public $defaultValue;
 
-    public function __construct($name, $keyField='value', $fileAppend = false)
+    public function __construct($name, $keyField='value', $fileAppend = false, $defaultValue=null)
     {
         $this->name     = $name;
         $this->filePath = Input::INPUT_OUTPUT_FOLDER . '/' . $name;
         $this->keyField = $keyField;
+        $this->defaultValue = $defaultValue;
     }
 
     public function getName()
@@ -41,7 +43,15 @@ class KeyFileEnvironment implements Environment
 
         if (empty($data)) {
             echo "\n [KEY-FILE][WARNING] Empty data set";
-            return;
+
+            if ($this->defaultValue !== null) {
+                echo "\n [KEY-FILE] Applying default value: " . $this->defaultValue;
+                file_put_contents($this->filePath, $this->defaultValue);
+                return;
+            } else {
+                echo "\n [KEY-FILE] No default value set for empty data sets";
+                return;
+            }
         }
 
         foreach ($data as $index => $keyRows) {
