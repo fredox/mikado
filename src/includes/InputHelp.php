@@ -119,7 +119,7 @@ class InputHelp {
         echo "\n [HELP] Available Groups:\n";
 
         foreach ($config['groups'] as $groupName => $tables) {
-            echo "\n  - " . $groupName . ' (with tables:' . implode(',', $tables) . ')';
+            echo "\n  - " . $groupName . ' (with tables -> ' . implode(',', $tables) . ')';
         }
     }
 

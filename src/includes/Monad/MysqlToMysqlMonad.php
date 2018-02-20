@@ -6,6 +6,7 @@ include_once('Monad.php');
 class MysqlToMysqlMonad implements Monad
 {
     public $config;
+    public $maxRowsPerInsert = 50;
 
     public function __construct($config)
     {
@@ -93,7 +94,7 @@ class MysqlToMysqlMonad implements Monad
 
 
         if (!empty($value)) {
-           return $this->wrapNonEmptyValue($value);
+           return $this->wrapNonEmptyValue($value, $fieldsDefinition[$field]);
         }
 
         if ($fieldsDefinition[$field]['null'] == 'YES') {
@@ -113,9 +114,9 @@ class MysqlToMysqlMonad implements Monad
      * @param $value
      * @return string
      */
-    public function wrapNonEmptyValue($value)
+    public function wrapNonEmptyValue($value, $fieldDefiniiton)
     {
-        if (is_numeric($value)) {
+        if (is_numeric($value) && !$fieldDefiniiton['isText']) {
             return $value;
         }
 

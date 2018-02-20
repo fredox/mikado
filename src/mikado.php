@@ -198,7 +198,7 @@ class Mikado {
             foreach ($steps as $stepArguments) {
                 echo "\n - Step " . $currentStep . " of " . $nSteps . "  [args] " . implode(" ", $stepArguments);
                 echo "\n =========================================================================================\n";
-                static::run($stepArguments);
+                static::start($stepArguments);
                 $currentStep++;
             }
 

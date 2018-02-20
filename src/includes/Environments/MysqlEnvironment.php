@@ -125,9 +125,9 @@ class MysqlEnvironment implements Environment
     		if (empty($result)) {
     		    echo "\n [i][". $this->name ."][WARNING] Not found results in table [" . $tableName . "]";
             } else {
+                echo "  (". count($result) .") rows";
     		    echo "\n [MYSQL ENVIRONMENT][SAVING PRIMARY KEYS]";
                 $this->savePrimaryKeys($tableName, $tableNameIndex, $result);
-                echo "  (". count($result) .") rows";
     		    $finalResult[$tableName] = $result;
             }
     	}
@@ -243,10 +243,20 @@ class MysqlEnvironment implements Environment
 
         foreach ($fieldsInformation as $fieldInformation) {
             $fieldName = $fieldInformation['Field'];
-            $hashFields[$fieldName]['type']    = $fieldInformation['Type'];
+            $hashFields[$fieldName]['type']    = strtolower($fieldInformation['Type']);
             $hashFields[$fieldName]['null']    = $fieldInformation['Null'];
             $hashFields[$fieldName]['key']     = $fieldInformation['Key'];
             $hashFields[$fieldName]['default'] = $fieldInformation['Default'];
+
+            $hashFields[$fieldName]['isText'] = false;
+            $textType = array('varchar', 'datetime', 'date', 'text', 'enum', 'set', 'char');
+
+            foreach ($textType as $type) {
+                if (strpos($hashFields[$fieldName]['type'], $type) === 0) {
+                    $hashFields[$fieldName]['isText'] = true;
+                    break;
+                }
+            }
         }
 
         return $hashFields;
