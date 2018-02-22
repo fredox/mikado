@@ -106,6 +106,11 @@ class MysqlEnvironment implements Environment
 	    return $result;
     }
 
+    public function affectedRows()
+    {
+        return mysqli_affected_rows($this->connection);
+    }
+
     public function get($queries, $key)
     {
     	$finalResult = array();
@@ -194,6 +199,8 @@ class MysqlEnvironment implements Environment
         if (empty($data)) {
             echo "\n [MYSQL ENVIRONMENT][" . $this->name . "] No regular data to execute";
         } else {
+            $affectedRows = 0;
+
             foreach ($data as $tableName => $queries) {
 
                 if (empty($queries)) {
@@ -201,13 +208,14 @@ class MysqlEnvironment implements Environment
                 }
 
                 echo "\n [" . $this->name . "][i] Exporting to table [" . $tableName . "] on [" . $this->name . "] environment";
-                echo " [" . count($queries) . "] rows";
+
 
                 foreach ($queries as $query) {
-
                     $this->query($query);
+                    $affectedRows += $this->affectedRows();
                 }
 
+                echo " [" . $affectedRows . "] rows";
             }
         }
     }

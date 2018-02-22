@@ -62,7 +62,9 @@ class KeyFileEnvironment implements Environment
             }
 
             foreach ($keyRows as $row) {
-                $keys[] = $row[$this->keyField];
+                $value = (empty($row[$this->keyField])) ? $this->defaultValue : $row[$this->keyField];
+
+                $keys[] = $value;
             }
         }
 
