@@ -47,12 +47,26 @@ class MysqlToMysqlMonad implements Monad
 
             $fields = array_keys($rows[0]);
 
-            foreach ($rows as $row) {
-                $query  = $targetEnvironment->operation;
-                $query .= " INTO " . $tableName . " (" . implode($fields, ',');
-                $query .= ") VALUES (" . implode($row, ',') . ");";
+            $insertedRows = 0;
+            $nRows  = count($rows);
+            $values = array();
 
-                $sqlData[$tableName][] = $query;
+            foreach ($rows as $index => $row) {
+                $values[] = "(" . implode($row, ',') . ")";
+                $insertedRows++;
+
+                $lastRowInserted = ($nRows == $insertedRows);
+                $nextInsertBulk  = ($insertedRows % $this->maxRowsPerInsert) == 0;
+
+                if ($lastRowInserted || $nextInsertBulk) {
+                    $query  = $targetEnvironment->operation;
+                    $query .= " INTO " . $tableName . " (" . implode($fields, ',') . ") VALUES ";
+                    $query .= implode(',', $values);
+
+                    //echo "\n Table: " . $tableName . " Bulk size: " . count($values);
+                    $values = array();
+                    $sqlData[$tableName][] = $query;
+                }
             }
 
         }

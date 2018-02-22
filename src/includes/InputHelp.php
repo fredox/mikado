@@ -119,8 +119,11 @@ class InputHelp {
         echo "\n [HELP] Available Groups:\n";
 
         foreach ($config['groups'] as $groupName => $tables) {
-            echo "\n  - " . $groupName . ' (with tables -> ' . implode(',', $tables) . ')';
+            $defaultTxt = (in_array($groupName, $config['groups-to-import'])) ? ' [DEFAULT]' : '';
+            echo "\n  - " . $groupName . ' (with tables -> ' . implode(',', $tables) . ')' . ' ' . $defaultTxt;
         }
+
+        echo "\n";
     }
 
     public static function showQueries($configPath)
