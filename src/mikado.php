@@ -3,9 +3,14 @@
 error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
 
 include_once('includes/InputHelp.php');
+include_once('includes/Update.php');
 
 //remove script name from params
 array_shift($argv);
+
+if (array_key_exists(0, $argv)) {
+    Update::checkUpdate($argv[0]);
+}
 
 InputHelp::getHelp($argv);
 
@@ -133,7 +138,7 @@ class Mikado {
             return array($configPath, $customGroupTags, $newArgs);
         }
 
-        return array('config', $customGroupTags, $args);
+        return array('config/default', $customGroupTags, $args);
     }
 
     public static function getGroupsToImport($customGroupTags, $config)

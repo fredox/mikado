@@ -73,7 +73,12 @@ class InputHelp {
     {
         $config = array();
 
-        include_once('config/config.php');
+        if (!is_file('config/default/config.php')) {
+            echo "\n [ERROR] There is no default config to load.\n\n";
+            exit;
+        }
+
+        include_once('config/default/config.php');
 
         static::showEnvironments($config);
     }
