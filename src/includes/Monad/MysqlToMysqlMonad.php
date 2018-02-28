@@ -121,7 +121,7 @@ class MysqlToMysqlMonad implements Monad
 
         $value = $fieldsDefinition[$field]['default'];
 
-        return $value;
+        return $this->wrapNonEmptyValue($value, $fieldsDefinition[$field]);
     }
 
     /**

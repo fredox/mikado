@@ -249,6 +249,10 @@ class MysqlEnvironment implements Environment
 
         $fieldsInformation = $this->query($sql, true);
 
+        if (empty($fieldsInformation)) {
+            return $hashFields;
+        }
+
         foreach ($fieldsInformation as $fieldInformation) {
             $fieldName = $fieldInformation['Field'];
             $hashFields[$fieldName]['type']    = strtolower($fieldInformation['Type']);
