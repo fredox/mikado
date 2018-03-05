@@ -89,6 +89,11 @@ class MysqlEnvironment implements Environment
 
     public function query($query, $fetch=false)
     {
+        if (empty($query)) {
+            echo "\n [WARNING][MYSQL] Empty query. Skipping data collection";
+            return false;
+        }
+
 	    $resultSet = mysqli_query($this->connection, $query);
 	    $result    = array();
 
@@ -116,14 +121,17 @@ class MysqlEnvironment implements Environment
     	$finalResult = array();
 
     	foreach ($queries as $tableNameIndex => $query) {
+            list($tableName, $comment) = $this->getRealTableName($tableNameIndex);
+
     	    if (empty($query)) {
     	        echo "\n [WARNING][". $this->name ."] Empty query for [" . $tableNameIndex . "]";
+    	        $finalResult[$tableName] = false;
+    	        continue;
             }
 
             $query = str_replace('@KEY', $key, $query);
     	    $query = $this->replaceSavedPrimaryKeys($query);
-    	    // echo "\n\n" . $query . "\n\n";
-            list($tableName, $comment) = $this->getRealTableName($tableNameIndex);
+
             echo "\n [i][". $this->name ."] collecting data from [" . $tableName . $comment . "]";
     		$result = $this->query($query, true);
 

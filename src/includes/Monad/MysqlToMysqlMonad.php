@@ -32,6 +32,10 @@ class MysqlToMysqlMonad implements Monad
 
         foreach ($data as $tableName => $rows) {
 
+            if (empty($rows)) {
+                continue;
+            }
+
             $fieldsDefinition = $targetEnvironment->describe($tableName);
 
             foreach ($rows as $index => $row) {

@@ -19,6 +19,10 @@ class SchemaTransformation implements Transformation
 
         $tables = $targetEnvironment->query('SHOW TABLES', true);
 
+        if (empty($tables)) {
+            echo "\n [TRANSFORMATION][SCHEMA] There no tables to put schema";
+        }
+
         foreach ($tables as $tableInTargetEnvironment) {
             $tablesInTargetEnvironment[] = $tableInTargetEnvironment['Tables_in_' . $targetEnvironment->dbname];
         }
@@ -29,6 +33,12 @@ class SchemaTransformation implements Transformation
                 echo " \n [TRANSFORMATION][SCHEMA] Adding create table for [" . $table . "]";
                 $query = 'SHOW CREATE TABLE ' . $table;
                 $createTable = $sourceEnvironment->query($query, true);
+
+                if ($createTable === false) {
+                    echo " \n [TRANSFORMATION][SCHEMA] Source environment table: " . $table . " does not exists";
+                    continue;
+                }
+
                 $createTableStatement = $createTable[0]['Create Table'] . ";";
                 $createTableStatement = str_replace(array("\n","\r"), " ", $createTableStatement);
 

@@ -1,5 +1,7 @@
 <?php
 
+ini_set('memory_limit', '512M');
+
 error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
 
 include_once('includes/InputHelp.php');
