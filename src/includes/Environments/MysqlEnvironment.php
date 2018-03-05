@@ -48,7 +48,12 @@ class MysqlEnvironment implements Environment
 
             if (!empty($connection->connect_error)) {
                 echo "\n [ERROR][MYSQL][" . $this->name . "] ". $connection->connect_error . "\n\n";
-                //print_r($connection);
+                echo "\n [HOST] " . $host;
+                echo "\n [PORT] " . $port;
+                echo "\n [DB-NAME] " . $dbname;
+                echo "\n [DB-USER] " . $user;
+                echo "\n [DB-PASSWORD]" . $password;
+                 //print_r($connection);
                 exit;
             }
             static::$cachedConnections[$cacheHash] = $connection;
