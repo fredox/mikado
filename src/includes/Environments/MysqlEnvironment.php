@@ -268,7 +268,8 @@ class MysqlEnvironment implements Environment
 
         foreach ($fieldsInformation as $fieldInformation) {
             $fieldName = $fieldInformation['Field'];
-            $hashFields[$fieldName]['type']    = strtolower($fieldInformation['Type']);
+
+            $hashFields[$fieldName]['type']    = $this->getDefinitionType($fieldInformation['Type']);
             $hashFields[$fieldName]['null']    = $fieldInformation['Null'];
             $hashFields[$fieldName]['key']     = $fieldInformation['Key'];
             $hashFields[$fieldName]['default'] = $fieldInformation['Default'];
@@ -285,6 +286,15 @@ class MysqlEnvironment implements Environment
         }
 
         return $hashFields;
+    }
+
+    private function getDefinitionType($type)
+    {
+        if (preg_match("/^([^\(]+)\(.*$/", $type, $matches)) {
+            $type = $matches[1];
+        }
+
+        return strtolower($type);
     }
 }
 

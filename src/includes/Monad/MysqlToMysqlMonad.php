@@ -110,6 +110,9 @@ class MysqlToMysqlMonad implements Monad
     {
         $value = array_key_exists($field, $row) ? $row[$field] : null;
 
+        if (($value == 0 OR $value == '0') AND $fieldsDefinition[$field]['type'] == 'int') {
+            return 0;
+        }
 
         if (!empty($value)) {
            return $this->wrapNonEmptyValue($value, $fieldsDefinition[$field]);
@@ -132,9 +135,13 @@ class MysqlToMysqlMonad implements Monad
      * @param $value
      * @return string
      */
-    public function wrapNonEmptyValue($value, $fieldDefiniiton)
+    public function wrapNonEmptyValue($value, $fieldDefiniton)
     {
-        if (is_numeric($value) && !$fieldDefiniiton['isText']) {
+        if ($fieldDefiniton['type'] == 'int') {
+            return $value;
+        }
+
+        if (is_numeric($value) && !$fieldDefiniton['isText']) {
             return $value;
         }
 

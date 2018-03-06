@@ -27,6 +27,9 @@ class DropTransformation implements Transformation
 
         $sourceEnvironment->addRawQueries('Drop tables', $rawData);
 
+        // empty data because there is no info to insert in a table that does not exists
+        $data = array();
+
         return $data;
     }
 }
