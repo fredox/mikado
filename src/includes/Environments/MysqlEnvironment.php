@@ -12,13 +12,14 @@ class MysqlEnvironment implements Environment
 	public $password;
 	public $operation = 'INSERT';
 	public $socket = null;
+	public $savePrimaryKeys = true;
 	public $rawQueries = array();
 	public static $cachedConnections = array();
 	public static $savedPrimaryKeys = array();
 
 	public $connection;
 
-	public function __construct($name, $host, $port, $dbname, $user, $password, $socket=null)
+	public function __construct($name, $host, $port, $dbname, $user, $password, $savePrimaryKeys=true, $socket=null)
 	{
 		$this->name = $name;
 		$this->host = $host;
@@ -27,6 +28,7 @@ class MysqlEnvironment implements Environment
 		$this->user = $user;
 		$this->password = $password;
 		$this->socket = $socket;
+		$this->savePrimaryKeys = $savePrimaryKeys;
 
 		echo "\n [MYSQL ENVIRONMENT] Connecting to [" . $name . "]";
 
@@ -61,7 +63,9 @@ class MysqlEnvironment implements Environment
 
         $this->connection = $connection;
 
-        echo "\n [IN MEMORY PRIMARY KEYS] " . implode(",", array_keys(static::$savedPrimaryKeys));
+        if ($this->savePrimaryKeys) {
+            echo "\n [IN MEMORY PRIMARY KEYS] " . implode(",", array_keys(static::$savedPrimaryKeys));
+        }
     }
 
     public function addRawQueries($descriptor, $queries)
@@ -103,7 +107,8 @@ class MysqlEnvironment implements Environment
 	    $result    = array();
 
 	    if ($resultSet === false) {
-	        echo "\n [ERROR] " . mysqli_error($this->connection);
+	        //echo "\n [ERROR] " . mysqli_error($this->connection);
+	        //echo "\n QUERY:" . $query;
 	        return false;
 	    }
 
@@ -135,7 +140,10 @@ class MysqlEnvironment implements Environment
             }
 
             $query = str_replace('@KEY', $key, $query);
-    	    $query = $this->replaceSavedPrimaryKeys($query);
+
+    	    if ($this->savePrimaryKeys) {
+                $query = $this->replaceSavedPrimaryKeys($query);
+            }
 
             echo "\n [i][". $this->name ."] collecting data from [" . $tableName . $comment . "]";
     		$result = $this->query($query, true);
@@ -144,8 +152,12 @@ class MysqlEnvironment implements Environment
     		    echo "\n [i][". $this->name ."][WARNING] Not found results in table [" . $tableName . "]";
             } else {
                 echo "  (". count($result) .") rows";
-    		    echo "\n [MYSQL ENVIRONMENT][SAVING PRIMARY KEYS]";
-                $this->savePrimaryKeys($tableName, $tableNameIndex, $result);
+
+                if ($this->savePrimaryKeys) {
+                    echo "\n [MYSQL ENVIRONMENT][SAVING PRIMARY KEYS]";
+                    $this->savePrimaryKeys($tableName, $tableNameIndex, $result);
+                }
+
     		    $finalResult[$tableName] = $result;
             }
     	}

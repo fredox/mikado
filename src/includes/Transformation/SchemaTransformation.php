@@ -20,7 +20,7 @@ class SchemaTransformation implements Transformation
         $tables = $targetEnvironment->query('SHOW TABLES', true);
 
         if (empty($tables)) {
-            echo "\n [TRANSFORMATION][SCHEMA] There no tables to put schema";
+            echo "\n [TRANSFORMATION][SCHEMA] There no tables in target environment";
         }
 
         foreach ($tables as $tableInTargetEnvironment) {
@@ -28,8 +28,9 @@ class SchemaTransformation implements Transformation
         }
 
         foreach ($data as $table=>$rows) {
+            $targetEnvironmentType = $this->getTargetEnvironmentRealType();
 
-            if (!in_array($table, $tablesInTargetEnvironment)) {
+            if (!in_array($table, $tablesInTargetEnvironment) || ($targetEnvironmentType == 'dryrun')) {
                 echo " \n [TRANSFORMATION][SCHEMA] Adding create table for [" . $table . "]";
                 $query = 'SHOW CREATE TABLE ' . $table;
                 $createTable = $sourceEnvironment->query($query, true);
@@ -50,5 +51,12 @@ class SchemaTransformation implements Transformation
         $sourceEnvironment->addRawQueries('Creation tables', $rawData);
 
         return $data;
+    }
+
+    public function getTargetEnvironmentRealType()
+    {
+        $targetEnvirnmentName = $this->config['execution']['target_environment'];
+
+        return $this->config['environments'][$targetEnvirnmentName]['type'];
     }
 }
