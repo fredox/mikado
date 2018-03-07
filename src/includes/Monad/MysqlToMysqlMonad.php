@@ -110,7 +110,7 @@ class MysqlToMysqlMonad implements Monad
     {
         $value = array_key_exists($field, $row) ? $row[$field] : null;
 
-        if (($value == 0 OR $value == '0') AND $fieldsDefinition[$field]['type'] == 'int') {
+        if (($value === 0 OR $value == '0') AND $fieldsDefinition[$field]['type'] == 'int') {
             return 0;
         }
 

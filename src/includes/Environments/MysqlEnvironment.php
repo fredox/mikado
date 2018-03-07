@@ -107,7 +107,7 @@ class MysqlEnvironment implements Environment
 	    $result    = array();
 
 	    if ($resultSet === false) {
-	        //echo "\n [ERROR] " . mysqli_error($this->connection);
+	        echo "\n [ERROR] " . mysqli_error($this->connection);
 	        //echo "\n QUERY:" . $query;
 	        return false;
 	    }
