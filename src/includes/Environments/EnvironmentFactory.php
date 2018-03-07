@@ -19,7 +19,7 @@ class EnvironmentFactory
 			case 'mysql':
 			    list($host, $port) = self::getPortAndHost($environmentConfig['host']);
 			    $socket = (array_key_exists('socket', $environmentConfig)) ? $environmentConfig['socket'] : null;
-			    $savePrimaryKeys = (array_key_exists('save-keys', $environmentConfig)) ? $environmentConfig['save-keys'] : null;
+			    $savePrimaryKeys = (array_key_exists('save-keys', $environmentConfig)) ? $environmentConfig['save-keys'] : true;
 				return new MysqlEnvironment(
 					$environmentConfig['name'],
 					$host,
