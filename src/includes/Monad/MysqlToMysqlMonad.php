@@ -114,6 +114,10 @@ class MysqlToMysqlMonad implements Monad
             return 0;
         }
 
+        if (($value === 0 OR $value == '0') AND $fieldsDefinition[$field]['isText']) {
+            return '"0"';
+        }
+
         if (!empty($value)) {
            return $this->wrapNonEmptyValue($value, $fieldsDefinition[$field]);
         }
