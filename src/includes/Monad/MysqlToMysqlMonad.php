@@ -110,7 +110,7 @@ class MysqlToMysqlMonad implements Monad
     {
         $value = array_key_exists($field, $row) ? $row[$field] : null;
 
-        if (($value === 0 OR $value == '0') AND $fieldsDefinition[$field]['type'] == 'int') {
+        if (($value === 0 OR $value == '0') AND self::isInt($fieldsDefinition[$field])) {
             return 0;
         }
 
@@ -141,7 +141,7 @@ class MysqlToMysqlMonad implements Monad
      */
     public function wrapNonEmptyValue($value, $fieldDefiniton)
     {
-        if ($fieldDefiniton['type'] == 'int') {
+        if (self::isInt($fieldDefiniton)) {
             return $value;
         }
 
@@ -150,6 +150,11 @@ class MysqlToMysqlMonad implements Monad
         }
 
         return '"' . addslashes($value) . '"';
+    }
+
+    public function isInt($fieldDefinition)
+    {
+        return (($fieldDefinition['type'] == 'int') || ($fieldDefinition['type'] == 'tinyint'));
     }
 
     public function executeRawQueriesAtFirst($targetEnvironment)
