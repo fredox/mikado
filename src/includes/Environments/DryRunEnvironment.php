@@ -72,7 +72,7 @@ class DryRunEnvironment implements Environment
                 $this->saveInFile("\n" . '--' . $msg);
                 foreach ($rQueries as $rQuery) {
                     echo "\n [DRY-RUN][RAW QUERIES] Saving raw queries in " . $this->filePath;
-                    $this->saveInFile("\n" . $rQuery);
+                    $this->saveInFile("\n" . $rQuery . ";");
                 }
             }
         } else {
@@ -96,7 +96,7 @@ class DryRunEnvironment implements Environment
             }
 
             foreach ($queries as $query) {
-                $this->saveInFile("\n" . $query);
+                $this->saveInFile("\n" . $query . ";");
             }
 
         }
