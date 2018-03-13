@@ -175,6 +175,12 @@ class MysqlEnvironment implements Environment
             }
 
             $query = str_replace('#' . $tableNameIndex, $replacement, $query);
+
+            // if the index of query is of type table:description, also allow use #table tag
+            if (strpos($tableNameIndex, ':') !== false) {
+                list($realTable, $comment) = explode(':', $tableNameIndex);
+                $query = str_replace('#' . $realTable, $replacement, $query);
+            }
         }
 
         return $query;
