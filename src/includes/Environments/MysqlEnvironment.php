@@ -175,12 +175,6 @@ class MysqlEnvironment implements Environment
             }
 
             $query = str_replace('#' . $tableNameIndex, $replacement, $query);
-
-            // if the index of query is of type table:description, also allow use #table tag
-            if (strpos($tableNameIndex, ':') !== false) {
-                list($realTable, $comment) = explode(':', $tableNameIndex);
-                $query = str_replace('#' . $realTable, $replacement, $query);
-            }
         }
 
         return $query;
@@ -192,7 +186,9 @@ class MysqlEnvironment implements Environment
         if (count(current($dataRows)) == 1) {
             $sample = array_keys(current($dataRows));
             $primaryKeyField = array_shift($sample);
-            static::$savedPrimaryKeys[$tableNameIndex] = array_column($dataRows, $primaryKeyField);
+            $keysToSave = array_column($dataRows, $primaryKeyField);
+            static::$savedPrimaryKeys[$tableNameIndex] = $keysToSave;
+            $this->saveMasterTableKeysIfNeeded($tableNameIndex, $keysToSave);
             return;
         }
 
@@ -210,7 +206,22 @@ class MysqlEnvironment implements Environment
             return;
         }
 
-        static::$savedPrimaryKeys[$tableNameIndex] = array_column($dataRows, $primaryKeyField);
+        $keysToSave = array_column($dataRows, $primaryKeyField);
+        $this->saveMasterTableKeysIfNeeded($tableNameIndex, $keysToSave);
+        static::$savedPrimaryKeys[$tableNameIndex] = $keysToSave;
+    }
+
+    public function saveMasterTableKeysIfNeeded($tableNameIndex, $keys)
+    {
+        if (strpos($tableNameIndex, ':') !== false) {
+            list($realTableNameIndex, $foo) = explode(':', $tableNameIndex);
+            if (!array_key_exists($realTableNameIndex, static::$savedPrimaryKeys)) {
+                static::$savedPrimaryKeys[$realTableNameIndex] = array();
+            }
+
+            $currentKeysContent = static::$savedPrimaryKeys[$realTableNameIndex];
+            static::$savedPrimaryKeys[$realTableNameIndex] = array_merge($currentKeysContent, $keys);
+        }
     }
 
     public function getRealTableName($tableName)
