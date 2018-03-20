@@ -62,11 +62,11 @@ Class Health {
     public static function loadConfig()
     {
         if (!is_file(self::$configDir . "/config.php")) {
-            echo " \n [ERROR][HEALTH] queries file does not exists in " . self::$configDir . "\n\n";
+            echo " \n [ERROR][HEALTH] config file does not exists in " . self::$configDir . "\n\n";
             exit;
         }
 
-        echo " \n [OK][HEALTH] Queries file exists";
+        echo " \n [OK][HEALTH] Config file exists";
 
         $config = array();
 

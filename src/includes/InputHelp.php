@@ -105,6 +105,12 @@ class InputHelp {
     {
         $config = array();
 
+        if (!is_dir('config/' . $configPath)) {
+            echo "\n [ERROR] config " . $configPath . " does NOT exists.\n\n";
+            self::showConfigFolders();
+            die;
+        }
+
         include_once('config/' . $configPath . '/config.php');
 
         static::showEnvironments($config);
