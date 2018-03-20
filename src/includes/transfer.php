@@ -18,16 +18,16 @@ function transfer($sourceEnvironment, $targetEnvironment, $queries, $key, $confi
     $sourceEnvironment = EnvironmentFactory::getEnvironment($config['environments'][$sourceEnvironment]);
     $targetEnvironment = EnvironmentFactory::getEnvironment($config['environments'][$targetEnvironment]);
 
-    $queriesIndexToProcess = $queriesToProcess = array();
+    $queriesIndexes       = array_keys($queries);
+    $queriesToProcess     = array();
     $groupsIndexToProcess = $config['groups-to-import'];
 
-    foreach ($groupsIndexToProcess as $groupIndex){
-        $queriesIndexToProcess = array_merge($queriesIndexToProcess, $config['groups'][$groupIndex]);
-    }
 
-    foreach ($queries as $queryIndex => $query) {
-        if (in_array($queryIndex, $queriesIndexToProcess)) {
-            $queriesToProcess[$queryIndex] = $query;
+    foreach ($groupsIndexToProcess as $groupIndex){
+        foreach ($config['groups'][$groupIndex] as $queryIndexToProcess) {
+            if (in_array($queryIndexToProcess, $queriesIndexes)) {
+                $queriesToProcess[$queryIndexToProcess] = $queries[$queryIndexToProcess];
+            }
         }
     }
 
