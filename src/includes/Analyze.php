@@ -7,6 +7,12 @@ class Analyze extends Health {
     /** @var MysqlEnvironment */
     public static $environment;
 
+    /** @var array */
+    public static $tablesInformation;
+
+    /** @var array */
+    public static $topologicalOrderTables;
+
     public static function checkAnalyze($analyzeParam, $params)
     {
         if ($analyzeParam != '-analyze') {
@@ -19,6 +25,7 @@ class Analyze extends Health {
         self::loadQueries();
         self::loadEnvironment($params);
         self::loadTablesInformation();
+        self::getTopologicalOrder();
 
         self::endCheck();
     }
@@ -60,6 +67,104 @@ class Analyze extends Health {
 
     public static function loadTablesInformation()
     {
-        $tablesInformation = self::$environment->query('SHOW TABLES', true);
+        $tables = self::$environment->query('SHOW TABLES', true);
+        $dbName = self::$environment->dbname;
+        $index  = 'Tables_in_' . $dbName;
+        $tablesInformation = array();
+
+        foreach ($tables as $table) {
+            $tableName = $table[$index];
+            $metaInfoQuery = "SELECT * FROM information_schema.REFERENTIAL_CONSTRAINTS
+            WHERE information_schema.REFERENTIAL_CONSTRAINTS.TABLE_NAME = '" . $tableName . "'";
+            $info = self::$environment->query($metaInfoQuery, true);
+
+            $tablesInformation[$tableName]['constraints'] = $info;
+        }
+
+        self::$tablesInformation = $tablesInformation;
+    }
+
+    public static function getTopologicalOrder()
+    {
+        $tablesReferences = array();
+
+        foreach (self::$tablesInformation as $tableName => $tableInformation) {
+
+            if (empty($tableInformation['constraints'])) {
+                $tablesReferences[$tableName]['constraints'] = array();
+            }
+
+            foreach ($tableInformation['constraints'] as $constraint) {
+                $linkedTable = $constraint['REFERENCED_TABLE_NAME'];
+
+                if (!array_key_exists($tableName, $tablesReferences)) {
+                    $tablesReferences[$tableName]['constraints'] = array();
+                }
+
+                if (!in_array($linkedTable, $tablesReferences[$tableName]['constraints'])) {
+                    $tablesReferences[$tableName]['constraints'][] = $linkedTable;
+                }
+            }
+        }
+
+        self::$topologicalOrderTables = array();
+
+        while (self::tablesReferencesIsNotEmpty($tablesReferences)) {
+            $tablesWithNoReferences = self::getTablesReferencesWithNoReferences($tablesReferences);
+            self::$topologicalOrderTables = array_merge(self::$topologicalOrderTables, $tablesWithNoReferences);
+            self::$topologicalOrderTables = array_unique(self::$topologicalOrderTables);
+
+            $tablesReferences = self::removeReferencesFromTablesReferences($tablesReferences, $tablesWithNoReferences);
+        }
+
+        $tablesWithNoReferences = self::getTablesReferencesWithNoReferences($tablesReferences);
+        self::$topologicalOrderTables = array_merge(self::$topologicalOrderTables, $tablesWithNoReferences);
+        self::$topologicalOrderTables = array_unique(self::$topologicalOrderTables);
+
+        echo "\n [ANALYZE] Tables in topological order from less dependencies to more";
+
+        foreach (self::$topologicalOrderTables as $table) {
+            echo "\n\t - " . $table;
+        }
+
+        echo "\n\n";
+    }
+
+    public static function tablesReferencesIsNotEmpty($tablesReferences)
+    {
+        foreach ($tablesReferences as $tableName => $tableReferences) {
+            if (!empty($tableReferences['constraints'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static function getTablesReferencesWithNoReferences($tablesReferences)
+    {
+        $result = array();
+
+        foreach ($tablesReferences as $tableName => $tableReferences) {
+            if (empty($tableReferences['constraints'])) {
+                $result[] = $tableName;
+            }
+        }
+
+        return $result;
+    }
+
+    public static function removeReferencesFromTablesReferences($tablesReferences, $references)
+    {
+        foreach ($tablesReferences as $tableName => $tableReferences) {
+            foreach ($references as $reference) {
+                if (in_array($reference, $tableReferences['constraints'])) {
+                    $indexToRemove = array_search($reference, $tableReferences['constraints']);
+                    unset($tablesReferences[$tableName]['constraints'][$indexToRemove]);
+                }
+            }
+        }
+
+        return $tablesReferences;
     }
 }
