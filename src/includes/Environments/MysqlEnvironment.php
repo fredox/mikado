@@ -55,6 +55,7 @@ class MysqlEnvironment implements Environment
                 echo "\n [DB-NAME] " . $dbname;
                 echo "\n [DB-USER] " . $user;
                 echo "\n [DB-PASSWORD]" . $password;
+                echo "\n\n";
                  //print_r($connection);
                 exit;
             }
