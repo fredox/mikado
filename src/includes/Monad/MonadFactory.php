@@ -2,6 +2,14 @@
 
 include_once('idMonad.php');
 
+require_once('MysqlToDryrunMonad.php');
+require_once('MysqlToMysqlMonad.php');
+require_once('DryrunToMysqlMonad.php');
+require_once('RawToDryrunMonad.php');
+require_once('RawToMysqlMonad.php');
+require_once('SerializeddatafileToDryrunMonad.php');
+require_once('SerializeddatafileToMysqlMonad.php');
+
 class MonadFactory
 {
     public static function getMonad(Environment $sourceEnvironment, Environment $targetEnvironment, $config)

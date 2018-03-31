@@ -42,7 +42,14 @@ class MysqlToDryrunMonad extends MysqlToMysqlMonad implements Monad
             $virtualEnvironment = $sourceEnvironment;
         }
 
-        echo "\n [MysqlToMysql][VirtualEnvironment] " . $virtualEnvironment->name;
+        if (!$virtualEnvironment instanceof MysqlEnvironment) {
+            echo "\n [ERROR][DryRun] VirtualEnvironment (targetEnvironment in Dry run or Source Environment) must be ";
+            echo "\n [ERROR][DryRun] of type MysqlEnvironment, [" . get_class($virtualEnvironment) . "] given with environment name: ";
+            echo $virtualEnvironment->getName() . "\n\n";
+            exit(0);
+        }
+
+        echo "\n [MysqlToDryRun][VirtualEnvironment] " . $virtualEnvironment->name;
 
         return $virtualEnvironment;
     }

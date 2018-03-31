@@ -4,6 +4,7 @@ include_once('MysqlEnvironment.php');
 include_once('DryRunEnvironment.php');
 include_once('KeyFileEnvironment.php');
 include_once('RawEnvironment.php');
+include_once('SerializedDataFileEnvironment.php');
 
 class EnvironmentFactory
 {
@@ -62,6 +63,11 @@ class EnvironmentFactory
                 return new RawEnvironment(
                     $environmentConfig['name'],
                     $environmentConfig['putOperation']
+                );
+            case 'serializeddatafile':
+                return new SerializedDataFileEnvironment(
+                    $environmentConfig['name'],
+                    $environmentConfig['filePath']
                 );
 			default:
 				die($errorMsg . ". Type: " . $environmentConfig['type'] . "\n\n");
