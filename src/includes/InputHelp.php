@@ -1,5 +1,7 @@
 <?php
 
+include_once('format.php');
+
 class InputHelp {
 
 
@@ -15,6 +17,12 @@ class InputHelp {
 
         if (preg_match("/^recipe:$/", $commandArgs)) {
             static::showRecipes();
+            echo "\n\n";
+            exit;
+        }
+
+        if (preg_match("/^recipe: -v$/", $commandArgs)) {
+            static::showRecipes($verbose=true);
             echo "\n\n";
             exit;
         }
@@ -155,14 +163,25 @@ class InputHelp {
         }
     }
 
-    public static function showRecipes()
+    public static function showRecipes($verbose=false)
     {
         $files = array_filter(glob('recipes/*'), 'is_file');
-        echo "\n [HELP] Available recipes:\n";
+        echo "\n [HELP] Available recipes:\n\n";
 
         foreach ($files as $file) {
             $recipe = substr($file, 8);
-            echo "\n  - " . $recipe;
+
+            if ($verbose) {
+                squaredText($recipe, $indented=1);
+                $recipeContent = file($file);
+                foreach ($recipeContent as $recipeContentLine) {
+                    echo "\t\t" . $recipeContentLine;
+                }
+                echo "\n\n\n";
+            } else {
+                echo "\n  - " . $recipe;
+            }
+
         }
 
         echo "\n\n";

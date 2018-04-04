@@ -64,3 +64,18 @@ function getHeadersAndRows($sqlResult)
     return array($result, $headers);
 
 }
+
+function squaredText($text, $indented=2)
+{
+    if (strlen($text) > 70) {
+        $text = substr($text, 0, 66) . '...';
+    }
+
+    $length  = strlen($text);
+    $topDown = '+--' . str_repeat('-', $length) . '--+';
+    $middle  = '|  ' . $text . '  |';
+
+    $indentation = str_repeat("\t", $indented);
+
+    echo $indentation . $topDown . "\n" . $indentation . $middle . "\n" . $indentation . $topDown . "\n\n";
+}
