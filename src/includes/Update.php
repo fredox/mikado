@@ -16,6 +16,9 @@ class Update {
         self::checkIniFileExists();
         $configs = self::parseIniFile();
 
+        $replaceVarsInIni = self::getVars($configs);
+        $configs = self::replaceVarsInIni($configs, $replaceVarsInIni);
+
         $configFolders = self::getConfigFolders($configs);
         self::createConfigFolders($configFolders);
         self::createConfigFiles($configFolders);
@@ -28,6 +31,42 @@ class Update {
 
         echo " \n [UPDATE] Updated configs end. \n\n";
         exit;
+    }
+
+    public static function getVars($configs)
+    {
+        $replaceVars = array();
+
+        echo "\n [update] Reading vars to replace in ini file...";
+
+        foreach ($configs as $section => $sectionContent) {
+            if (preg_match("/vars:(.*)/", $section, $matches)) {
+                foreach ($sectionContent as $var => $replacement) {
+                    $replaceVars[$var] = $replacement;
+                }
+            }
+        }
+
+        return $replaceVars;
+    }
+
+    public static function replaceVarsInIni($configs, $replaceVarsInIni)
+    {
+        if (empty($replaceVarsInIni)) {
+            echo "\n [update] No vars found to replace in ini file.";
+            return $configs;
+        }
+
+        foreach ($configs as $section => $configContent) {
+            foreach ($configContent as $config => $value) {
+                foreach ($replaceVarsInIni as $var => $replacement) {
+                    $value = str_replace('[' . $var . ']', $replacement, $value);
+                    $configs[$section][$config] = $value;
+                }
+            }
+        }
+
+        return $configs;
     }
 
     public static function checkIniFileExists()
