@@ -150,6 +150,7 @@ class MysqlEnvironment implements Environment
     		$result = $this->query($query, true);
 
     		if (empty($result)) {
+    		    $this->savePrimaryKeys($tableName, $tableNameIndex, array(array('result' => 'FALSE')));
     		    echo "\n [i][". $this->name ."][WARNING] Not found results in table [" . $tableName . "]";
             } else {
                 echo "  (". count($result) .") rows";
@@ -172,7 +173,7 @@ class MysqlEnvironment implements Environment
             if (is_numeric(static::$savedPrimaryKeys[$tableNameIndex][0])) {
                 $replacement = implode(',', static::$savedPrimaryKeys[$tableNameIndex]);
             } else {
-                $replacement = '"' . str_replace(',', '","', implode(',', static::$savedPrimaryKeys[$tableNameIndex]));
+                $replacement = '"' . str_replace(',', '","', implode(',', static::$savedPrimaryKeys[$tableNameIndex])) . '"';
             }
 
             $query = str_replace('#' . $tableNameIndex, $replacement, $query);
