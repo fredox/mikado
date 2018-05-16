@@ -210,7 +210,7 @@ class MysqlEnvironment implements Environment
 
         $keysToSave = array_column($dataRows, $primaryKeyField);
         $this->saveMasterTableKeysIfNeeded($tableNameIndex, $keysToSave);
-        static::$savedPrimaryKeys[$tableNameIndex] = $keysToSave;
+        static::$savedPrimaryKeys[$tableNameIndex] = array_unique($keysToSave);
     }
 
     public function saveMasterTableKeysIfNeeded($tableNameIndex, $keys)
@@ -222,7 +222,7 @@ class MysqlEnvironment implements Environment
             }
 
             $currentKeysContent = static::$savedPrimaryKeys[$realTableNameIndex];
-            static::$savedPrimaryKeys[$realTableNameIndex] = array_merge($currentKeysContent, $keys);
+            static::$savedPrimaryKeys[$realTableNameIndex] = array_unique(array_merge($currentKeysContent, $keys));
         }
     }
 

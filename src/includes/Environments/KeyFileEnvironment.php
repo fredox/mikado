@@ -68,6 +68,8 @@ class KeyFileEnvironment implements Environment
             }
         }
 
+        array_unique($keys);
+
         file_put_contents($this->filePath, implode(',', $keys));
     }
 
