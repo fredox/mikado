@@ -160,7 +160,11 @@ class MysqlEnvironment implements Environment
                     $this->savePrimaryKeys($tableName, $tableNameIndex, $result);
                 }
 
-    		    $finalResult[$tableName] = $result;
+                if (array_key_exists($tableName, $finalResult)) {
+                    $finalResult[$tableName] = array_merge($finalResult[$tableName], $result);
+                } else {
+                    $finalResult[$tableName] = $result;
+                }
             }
     	}
 
