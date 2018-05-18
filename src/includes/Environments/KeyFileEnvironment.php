@@ -8,6 +8,7 @@ class KeyFileEnvironment implements Environment
     public $name;
     public $filePath;
     public $keyField;
+    public static $firstExecutionByFile = array();
     public $fileAppend;
     public $defaultValue;
 
@@ -17,6 +18,7 @@ class KeyFileEnvironment implements Environment
         $this->filePath = Input::INPUT_OUTPUT_FOLDER . '/' . $name;
         $this->keyField = $keyField;
         $this->defaultValue = $defaultValue;
+        $this->fileAppend = $fileAppend;
     }
 
     public function getName()
@@ -35,9 +37,11 @@ class KeyFileEnvironment implements Environment
     {
         $keys = array();
 
-        echo "\n [KEY-FILE] Cleaning key file: " . $this->filePath;
-
-        file_put_contents($this->filePath, "");
+        if (!array_key_exists($this->filePath, self::$firstExecutionByFile)) {
+            echo "\n [KEY-FILE] Cleaning key file: " . $this->filePath;
+            file_put_contents($this->filePath, "");
+            self::$firstExecutionByFile[$this->filePath] = true;
+        }
 
         echo "\n [KEY-FILE] Saving keys into file: " . $this->filePath;
 
@@ -69,6 +73,14 @@ class KeyFileEnvironment implements Environment
         }
 
         array_unique($keys);
+
+        if ($this->fileAppend) {
+            echo "\n [KEY-FILE][APPEND] Appending previous content to keys";
+            $content = file_get_contents($this->filePath);
+            if (!empty($content)) {
+                $keys[] = $content;
+            }
+        }
 
         file_put_contents($this->filePath, implode(',', $keys));
     }
