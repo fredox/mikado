@@ -163,7 +163,20 @@ class Update {
     public static function createConfigFiles($configs)
     {
         foreach ($configs as $config=>$info) {
-            $fileContent = file_get_contents($info['resource']['config-uri']);
+            $configFilePath = 'config/' . $config . '/config.php';
+
+            if (!array_key_exists('resource', $info)) {
+                if (is_file($configFilePath)) {
+                    echo "\n [INFO][UPDATE] No remote resource provided for config file, using local config instead";
+                    $fileContent = file_get_contents($configFilePath);
+                } else {
+                    echo "\n [ERROR][UPDATE] No config file present for config: " . $config;
+                    exit;
+                }
+            } else {
+                $fileContent = file_get_contents($info['resource']['config-uri']);
+            }
+
             if (strpos($fileContent, '<?php') === 0) {
                 echo "\n [UPDATE] Replacing values in config from mikado.ini";
 
@@ -174,7 +187,7 @@ class Update {
                 }
 
                 echo "\n [UPDATE] Creating config file for [" . $config . "] config";
-                file_put_contents('config/' . $config . '/config.php', $fileContent);
+                file_put_contents($configFilePath, $fileContent);
             } else {
                 echo "\n [ERROR][UPDATE] Remote file config: " . $info['resource']['config-uri'] . " is not a PHP file";
                 exit;
@@ -185,6 +198,17 @@ class Update {
     public static function createQueryFiles($configs)
     {
         foreach ($configs as $config=>$info) {
+            $queriesFilePath = 'config/' . $config . '/queries.php';
+
+            if (!array_key_exists('resource', $info)) {
+                if (is_file($queriesFilePath)) {
+                    echo "\n [INFO][UPDATE] No remote resource provided for queries, using local config instead";
+                    continue;
+                } else {
+                    echo "\n [ERROR][UPDATE] No queries file present for config: " . $config;
+                    exit;
+                }
+            }
             $fileContent = file_get_contents($info['resource']['queries-uri']);
             if (strpos($fileContent, '<?php') === 0) {
                 echo "\n [UPDATE] Creating queries file for [" . $config . "] config";
