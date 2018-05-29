@@ -108,8 +108,13 @@ class MysqlEnvironment implements Environment
 	    $result    = array();
 
 	    if ($resultSet === false) {
-	        echo "\n [ERROR] " . mysqli_error($this->connection);
-	        //echo "\n QUERY:" . $query;
+	        if (preg_match("/^DESCRIBE (.*$)/", $query, $matches)) {
+                echo "\n [WARNING] " . $matches[1] . " it is not a table ";
+            } else {
+                echo "\n [ERROR] " . mysqli_error($this->connection);
+                //echo "\n QUERY:" . $query;
+            }
+
 	        return false;
 	    }
 
@@ -152,6 +157,7 @@ class MysqlEnvironment implements Environment
     		if (empty($result)) {
     		    $this->savePrimaryKeys($tableName, $tableNameIndex, array(array('result' => 'FALSE')));
     		    echo "\n [i][". $this->name ."][WARNING] Not found results in table [" . $tableName . "]";
+    		    $finalResult[$tableName] = false;
             } else {
                 echo "  (". count($result) .") rows";
 

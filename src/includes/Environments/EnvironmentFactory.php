@@ -5,6 +5,7 @@ include_once('DryRunEnvironment.php');
 include_once('KeyFileEnvironment.php');
 include_once('RawEnvironment.php');
 include_once('SerializedDataFileEnvironment.php');
+include_once('CheckEnvironment.php');
 
 class EnvironmentFactory
 {
@@ -63,6 +64,10 @@ class EnvironmentFactory
                 return new RawEnvironment(
                     $environmentConfig['name'],
                     $environmentConfig['putOperation']
+                );
+            case 'check':
+                return new CheckEnvironment(
+                    $environmentConfig['name']
                 );
             case 'serializeddatafile':
                 return new SerializedDataFileEnvironment(

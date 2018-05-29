@@ -32,6 +32,21 @@ function headerFormat($txt)
     echo "\033[0;30m\033[47m".$txt."\033[0m";
 }
 
+function whiteFormat($txt)
+{
+    return "\033[0;30m\033[47m".$txt."\033[0m";
+}
+
+function greenFormat($txt)
+{
+    return "\033[0;30m\033[42m".$txt."\033[0m";
+}
+
+function redFormat($txt)
+{
+    return "\033[0;30m\033[41m".$txt."\033[0m";
+}
+
 function infoFormat($txt)
 {
     echo "\033[40m".$txt."\033[0m";
