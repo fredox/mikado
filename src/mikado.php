@@ -235,7 +235,7 @@ class Mikado {
             $key = array($key);
         }
 
-        return $key;
+        return array_unique($key);
     }
 }
 

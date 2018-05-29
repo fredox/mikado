@@ -4,33 +4,33 @@ include_once('Environment.php');
 
 class MysqlEnvironment implements Environment
 {
-	public $name;
-	public $host;
-	public $port;
-	public $dbname;
-	public $user;
-	public $password;
-	public $operation = 'INSERT';
-	public $socket = null;
-	public $savePrimaryKeys = true;
-	public $rawQueries = array();
-	public static $cachedConnections = array();
-	public static $savedPrimaryKeys = array();
+    public $name;
+    public $host;
+    public $port;
+    public $dbname;
+    public $user;
+    public $password;
+    public $operation = 'INSERT';
+    public $socket = null;
+    public $savePrimaryKeys = true;
+    public $rawQueries = array();
+    public static $cachedConnections = array();
+    public static $savedPrimaryKeys = array();
 
-	public $connection;
+    public $connection;
 
-	public function __construct($name, $host, $port, $dbname, $user, $password, $savePrimaryKeys=true, $socket=null)
-	{
-		$this->name = $name;
-		$this->host = $host;
-		$this->port = $port;
-		$this->dbname = $dbname;
-		$this->user = $user;
-		$this->password = $password;
-		$this->socket = $socket;
-		$this->savePrimaryKeys = $savePrimaryKeys;
+    public function __construct($name, $host, $port, $dbname, $user, $password, $savePrimaryKeys=true, $socket=null)
+    {
+        $this->name = $name;
+        $this->host = $host;
+        $this->port = $port;
+        $this->dbname = $dbname;
+        $this->user = $user;
+        $this->password = $password;
+        $this->socket = $socket;
+        $this->savePrimaryKeys = $savePrimaryKeys;
 
-		echo "\n [MYSQL ENVIRONMENT] Connecting to [" . $name . "]";
+        echo "\n [MYSQL ENVIRONMENT] Connecting to [" . $name . "]";
 
         $cacheHash = $this->getCacheHash();
 
@@ -56,7 +56,7 @@ class MysqlEnvironment implements Environment
                 echo "\n [DB-USER] " . $user;
                 echo "\n [DB-PASSWORD]" . $password;
                 echo "\n\n";
-                 //print_r($connection);
+                //print_r($connection);
                 exit;
             }
             static::$cachedConnections[$cacheHash] = $connection;
@@ -86,15 +86,15 @@ class MysqlEnvironment implements Environment
 
     public function getFields($table)
     {
-    	$fields = array();
+        $fields = array();
 
-    	$resultSet = mysqli_query($this->connection, 'SHOW COLUMNS FROM ' . $table);
+        $resultSet = mysqli_query($this->connection, 'SHOW COLUMNS FROM ' . $table);
 
-	    while ($record = mysqli_fetch_assoc($resultSet)) {
-	        $fields[] = $record['Field'];
-	    }
+        while ($record = mysqli_fetch_assoc($resultSet)) {
+            $fields[] = $record['Field'];
+        }
 
-    	return $fields;
+        return $fields;
     }
 
     public function query($query, $fetch=false)
@@ -104,27 +104,27 @@ class MysqlEnvironment implements Environment
             return false;
         }
 
-	    $resultSet = mysqli_query($this->connection, $query);
-	    $result    = array();
+        $resultSet = mysqli_query($this->connection, $query);
+        $result    = array();
 
-	    if ($resultSet === false) {
-	        if (preg_match("/^DESCRIBE (.*$)/", $query, $matches)) {
+        if ($resultSet === false) {
+            if (preg_match("/^DESCRIBE (.*$)/", $query, $matches)) {
                 echo "\n [WARNING] " . $matches[1] . " it is not a table ";
             } else {
                 echo "\n [ERROR] " . mysqli_error($this->connection);
                 //echo "\n QUERY:" . $query;
             }
 
-	        return false;
-	    }
+            return false;
+        }
 
-	    if ($fetch) {
-	    	while (($row = mysqli_fetch_assoc($resultSet)) !== null) {
-	    		$result[] = $row;
-	    	}
-	    }
+        if ($fetch) {
+            while (($row = mysqli_fetch_assoc($resultSet)) !== null) {
+                $result[] = $row;
+            }
+        }
 
-	    return $result;
+        return $result;
     }
 
     public function affectedRows()
@@ -134,30 +134,34 @@ class MysqlEnvironment implements Environment
 
     public function get($queries, $key)
     {
-    	$finalResult = array();
+        $finalResult = array();
 
-    	foreach ($queries as $tableNameIndex => $query) {
+        foreach ($queries as $tableNameIndex => $query) {
             list($tableName, $comment) = $this->getRealTableName($tableNameIndex);
 
-    	    if (empty($query)) {
-    	        echo "\n [WARNING][". $this->name ."] Empty query for [" . $tableNameIndex . "]";
-    	        $finalResult[$tableName] = false;
-    	        continue;
+            if (empty($query)) {
+                echo "\n [WARNING][". $this->name ."] Empty query for [" . $tableNameIndex . "]";
+                $finalResult[$tableName] = false;
+                continue;
             }
 
             $query = str_replace('@KEY', $key, $query);
 
-    	    if ($this->savePrimaryKeys) {
+            if ($this->savePrimaryKeys) {
                 $query = $this->replaceSavedPrimaryKeys($query);
             }
 
-            echo "\n [i][". $this->name ."] collecting data from [" . $tableName . $comment . "]";
-    		$result = $this->query($query, true);
+            echo "\n [i][". $this->name ."] collecting data from ". whiteFormat("[" . $tableName . $comment . "]");
+            $result = $this->query($query, true);
 
-    		if (empty($result)) {
-    		    $this->savePrimaryKeys($tableName, $tableNameIndex, array(array('result' => 'FALSE')));
-    		    echo "\n [i][". $this->name ."][WARNING] Not found results in table [" . $tableName . "]";
-    		    $finalResult[$tableName] = false;
+
+
+            if (empty($result)) {
+                $this->savePrimaryKeys($tableName, $tableNameIndex, array(array('result' => 'FALSE')));
+                echo "\n [i][". $this->name ."][WARNING] Not found results in table [" . $tableName . $comment . "]";
+                if (empty($finalResult[$tableName])) {
+                    $finalResult[$tableName] = false;
+                }
             } else {
                 echo "  (". count($result) .") rows";
 
@@ -167,14 +171,16 @@ class MysqlEnvironment implements Environment
                 }
 
                 if (array_key_exists($tableName, $finalResult)) {
-                    $finalResult[$tableName] = array_merge($finalResult[$tableName], $result);
+                    if ($finalResult[$tableName] !== false) {
+                        $finalResult[$tableName] = array_merge($finalResult[$tableName], $result);
+                    }
                 } else {
                     $finalResult[$tableName] = $result;
                 }
             }
-    	}
+        }
 
-    	return $finalResult;
+        return $finalResult;
     }
 
     public function replaceSavedPrimaryKeys($query)
@@ -261,7 +267,7 @@ class MysqlEnvironment implements Environment
                     echo "\n [" . $this->name . "][!] No data found for table [" . $tableName . "]";
                 }
 
-                echo "\n [" . $this->name . "][i] Exporting to table [" . $tableName . "] on [" . $this->name . "] environment";
+                echo "\n [" . $this->name . "][i] Exporting to table ". whiteFormat("[" . $tableName . "]"). " on [" . $this->name . "] environment";
 
 
                 foreach ($queries as $query) {
