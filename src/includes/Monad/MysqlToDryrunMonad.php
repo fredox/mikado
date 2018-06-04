@@ -28,7 +28,7 @@ class MysqlToDryrunMonad extends MysqlToMysqlMonad implements Monad
      * @param Environment $targetEnvironment
      * @return DryRunEnvironment|KeyFileEnvironment|MysqlEnvironment
      */
-    private function getVirtualTargetEnvironment(Environment $sourceEnvironment, Environment $targetEnvironment)
+    public function getVirtualTargetEnvironment(Environment $sourceEnvironment, Environment $targetEnvironment)
     {
         $dryRunEnvironmentName = $targetEnvironment->getName();
 

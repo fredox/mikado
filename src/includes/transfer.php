@@ -10,6 +10,9 @@ function transfer($sourceEnvironment, $targetEnvironment, $queries, $key, $confi
 
     $transformations = array();
 
+    $config['environments'][$sourceEnvironment]['configPath'] = $config['configPath'];
+    $config['environments'][$targetEnvironment]['configPath'] = $config['configPath'];
+
     $sourceEnvironment = EnvironmentFactory::getEnvironment($config['environments'][$sourceEnvironment]);
     $targetEnvironment = EnvironmentFactory::getEnvironment($config['environments'][$targetEnvironment]);
 

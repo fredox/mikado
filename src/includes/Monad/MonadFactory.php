@@ -9,6 +9,7 @@ require_once('RawToDryrunMonad.php');
 require_once('RawToMysqlMonad.php');
 require_once('SerializeddatafileToDryrunMonad.php');
 require_once('SerializeddatafileToMysqlMonad.php');
+require_once('RawToSerializeddatafileMonad.php');
 
 class MonadFactory
 {

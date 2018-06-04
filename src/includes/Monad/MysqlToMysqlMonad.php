@@ -38,6 +38,11 @@ class MysqlToMysqlMonad implements Monad
 
             $fieldsDefinition = $targetEnvironment->describe($tableName);
 
+            if ($fieldsDefinition === false) {
+                echo "\n [ERROR] Environment [" . $targetEnvironment->getName() . "] don't implements describe function\n\n";
+                exit;
+            }
+
             foreach ($rows as $index => $row) {
 
                 foreach ($fieldsDefinition as $fieldName => $fieldDefinition) {
@@ -119,7 +124,7 @@ class MysqlToMysqlMonad implements Monad
         }
 
         if (!empty($value)) {
-           return $this->wrapNonEmptyValue($value, $fieldsDefinition[$field]);
+            return $this->wrapNonEmptyValue($value, $fieldsDefinition[$field]);
         }
 
         if ($fieldsDefinition[$field]['null'] == 'YES') {

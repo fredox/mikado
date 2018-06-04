@@ -82,6 +82,7 @@ class Mikado {
         require_once('includes/format.php');
 
         $config['all-queries-indexes'] = array_keys($queries);
+        $config['configPath'] = $configPath;
 
         $config = Input::get($config, $params);
 
@@ -174,7 +175,7 @@ class Mikado {
         $filePath = 'recipes/' . $recipe;
 
         if (!is_file($filePath)) {
-                exit("\n[ERROR] Specified recipe file (" . $recipe . ") does NOT exists!\n\n");
+            exit("\n[ERROR] Specified recipe file (" . $recipe . ") does NOT exists!\n\n");
         }
 
         $steps  = array();
