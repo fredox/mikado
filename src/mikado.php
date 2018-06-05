@@ -8,6 +8,7 @@ include_once('includes/InputHelp.php');
 include_once('includes/Update.php');
 include_once('includes/Health.php');
 include_once('includes/Analyze.php');
+include_once('includes/Clean.php');
 
 //remove script name from params
 array_shift($argv);
@@ -16,6 +17,7 @@ if (array_key_exists(0, $argv)) {
     Update::checkUpdate($argv[0]);
     Health::checkHealth($argv[0], $argv);
     Analyze::checkAnalyze($argv[0], $argv);
+    Clean::checkClean($argv[0]);
 }
 
 InputHelp::getHelp($argv);
