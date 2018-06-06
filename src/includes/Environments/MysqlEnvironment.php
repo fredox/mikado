@@ -11,6 +11,7 @@ class MysqlEnvironment implements Environment
     public $user;
     public $password;
     public $operation = 'INSERT';
+    public $debug = true;
     public $socket = null;
     public $savePrimaryKeys = true;
     public $rawQueries = array();
@@ -99,6 +100,10 @@ class MysqlEnvironment implements Environment
 
     public function query($query, $fetch=false)
     {
+        if ($this->debug == true) {
+            file_put_contents('mysql.log', $query . "\n", FILE_APPEND);
+        }
+
         if (empty($query)) {
             echo "\n [WARNING][MYSQL] Empty query. Skipping data collection";
             return false;

@@ -6,7 +6,7 @@ include_once('Monad.php');
 class MysqlToMysqlMonad implements Monad
 {
     public $config;
-    public $maxRowsPerInsert = 50;
+    public $maxRowsPerInsert = 1;
 
     public function __construct($config)
     {

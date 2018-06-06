@@ -32,19 +32,22 @@ class SerializedDataFileEnvironment implements Environment
 
         $selectedKeys = array_keys($queries);
 
-        $this->selectedQueriesKeys = $selectedKeys;
+        $this->selectedQueriesKeys = $this->removeRawKeys($selectedKeys, $data, $this->configTag);
 
         if (!array_key_exists($this->configTag, $data)) {
             echo "[SerializedDataFile] No data for config: [" . $this->configTag . "]";
             return $returnedData;
         }
 
-        foreach ($data[$this->configTag] as $tableName => $rows) {
-            if (in_array($tableName, $selectedKeys)) {
-                echo "\n [SerializedDataFile] Getting data from [" . $tableName . "]";
-                $nRows = ($rows === false) ? 0 : count($rows);
+        foreach ($this->selectedQueriesKeys as $queryKey) {
+
+            if (in_array($queryKey, array_keys($data[$this->configTag]))) {
+                echo "\n [SerializedDataFile] Getting data from [" . $queryKey . "]";
+                $returnedData[$queryKey] = $data[$this->configTag][$queryKey];
+                $nRows = empty($returnedData[$queryKey]) ? 0 : count($returnedData[$queryKey]);
                 echo " (" . $nRows . ")";
-                $returnedData[$tableName] = $rows;
+            } else {
+                echo "\n [SerialiedDataFile][WARNING] index [" . $queryKey . "] not present in serialized file: " . $this->filePath;
             }
         }
 
@@ -142,6 +145,29 @@ class SerializedDataFileEnvironment implements Environment
         }
 
         return $result;
+    }
+
+    public function removeRawKeys($selectedKeys, $data, $configTag)
+    {
+        $regularKeys    = array();
+        $rawConfigKeys  = array_keys($data['RAW'][$configTag]);
+
+        foreach ($selectedKeys as $selectedKey) {
+            if (!in_array($selectedKey, $rawConfigKeys)) {
+                $regularKeys[] = $selectedKey;
+            }
+        }
+
+        // Remove comments from tables
+        if (!empty($regularKeys)) {
+            foreach ($regularKeys as $index => $regularKey) {
+                if (strpos($regularKey, ':') !== false) {
+                    $regularKeys[$index] = explode(':', $regularKey)[0];
+                }
+            }
+        }
+
+        return array_unique($regularKeys);
     }
 
     public function describe($dataIndex)
