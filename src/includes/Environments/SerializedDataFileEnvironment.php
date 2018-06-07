@@ -109,8 +109,8 @@ class SerializedDataFileEnvironment implements Environment
     private function checkFile()
     {
         if (!is_file($this->filePath)) {
-            echo "\n [ERROR][SerializedDataFile] file not found: " . $this->filePath . "\n\n";
-            exit(0);
+            echo "\n [INFO][SerializedDataFile] Creating file: " . $this->filePath . "\n\n";
+            file_put_contents($this->filePath, '');
         }
     }
 
