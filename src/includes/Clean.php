@@ -27,11 +27,13 @@ Class Clean {
                 unlink($file); // delete file
             }
         }
+
+        echo "\n";
     }
 
     public static function endClean()
     {
-        echo "\n [Clean] END\n\n";
+        echo " [Clean] END\n\n";
         exit;
     }
 }

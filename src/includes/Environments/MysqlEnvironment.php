@@ -11,7 +11,7 @@ class MysqlEnvironment implements Environment
     public $user;
     public $password;
     public $operation = 'INSERT';
-    public $debug = true;
+    public $debug = false;
     public $socket = null;
     public $savePrimaryKeys = true;
     public $rawQueries = array();
@@ -264,9 +264,8 @@ class MysqlEnvironment implements Environment
         if (empty($data)) {
             echo "\n [MYSQL ENVIRONMENT][" . $this->name . "] No regular data to execute";
         } else {
-            $affectedRows = 0;
-
             foreach ($data as $tableName => $queries) {
+                $affectedRows = 0;
 
                 if (empty($queries)) {
                     echo "\n [" . $this->name . "][!] No data found for table [" . $tableName . "]";

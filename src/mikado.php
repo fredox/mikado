@@ -9,26 +9,34 @@ include_once('includes/Update.php');
 include_once('includes/Health.php');
 include_once('includes/Analyze.php');
 include_once('includes/Clean.php');
+include_once('includes/Alias.php');
 
 //remove script name from params
 array_shift($argv);
 
-if (array_key_exists(0, $argv)) {
-    Update::checkUpdate($argv[0]);
-    Health::checkHealth($argv[0], $argv);
-    Analyze::checkAnalyze($argv[0], $argv);
-    Clean::checkClean($argv[0]);
+$params = Alias::checkAlias($argv);
+
+if (array_key_exists(0, $params)) {
+    Update::checkUpdate($params[0]);
+    Health::checkHealth($params[0], $argv);
+    Analyze::checkAnalyze($params[0], $argv);
+    Clean::checkClean($params[0]);
 }
 
-InputHelp::getHelp($argv);
+InputHelp::getHelp($params);
 
-Mikado::start($argv);
+Mikado::start($params);
 
 class Mikado {
 
     public static function start($args)
     {
-        if (!preg_match("/^recipe:(.*)$/", $args[0], $matches)) {
+        if (count($args) == 1 && $args[0] == '-clean') {
+            Clean::deleteIoFiles();
+            return;
+        }
+
+        if (!preg_match("/^(?:recipe|r):(.*)$/", $args[0], $matches)) {
             static::run($args);
         } else {
             $recipe = $matches[1];
@@ -232,13 +240,19 @@ class Mikado {
             exit;
         }
 
-        if ($config['compact-mode'] === false) {
-            $key = explode(',', $key);
-        } else {
-            $key = array($key);
+        $keys = explode(',', $key);
+        $keys = array_unique($keys);
+
+        if ($config['compact-mode'] === true) {
+            foreach ($keys as $i=>$key) {
+                if (!preg_match("/^[0-9]+$/", $key)) {
+                    $keys[$i] = "'" . $key . "'";
+                }
+            }
+            $keys = array(implode(',', $keys));
         }
 
-        return array_unique($key);
+        return $keys;
     }
 }
 

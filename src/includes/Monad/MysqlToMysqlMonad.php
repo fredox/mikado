@@ -124,7 +124,7 @@ class MysqlToMysqlMonad implements Monad
         }
 
         if (!empty($value)) {
-            return $this->wrapNonEmptyValue($value, $fieldsDefinition[$field]);
+           return $this->wrapNonEmptyValue($value, $fieldsDefinition[$field]);
         }
 
         if ($fieldsDefinition[$field]['null'] == 'YES') {

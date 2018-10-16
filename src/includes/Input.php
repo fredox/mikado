@@ -107,12 +107,14 @@ class Input
 
     public static function inputError($msg, $config, $verbose = false)
     {
-        echo "\n\n============================ CONFIG DUMP ==================================\t";
-        print_r($config);
-        echo "\n\n============================ END OF DUMP ==================================\t";
         echo "\n\n[ERROR][INPUT] " . $msg;
+        echo "\n [USAGE - I] php mikado.php [SOURCE] [DEST] [KEYS]";
+        echo "\n [USAGE - II] php mikado.php cfg:[CUSTOM_CONFIG] [SOURCE] [DEST] [KEYS]";
+        echo "\n [USAGE - III] php mikado.php cfg:[CUSTOM_CONFIG]:[GROUP] [SOURCE] [DEST] [KEYS]";
+        echo "\n [USAGE - IV] php mikado.php cfg:[CUSTOM_CONFIG]::[QUERY_INDEX] [SOURCE] [DEST] [KEYS]";
         echo "\n\n\n";
         if ($verbose) {
+            print_r($config);
             print_r($verbose);
         }
         exit(0);

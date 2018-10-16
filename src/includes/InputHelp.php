@@ -15,13 +15,13 @@ class InputHelp {
 
         $commandArgs = implode(' ', $args);
 
-        if (preg_match("/^recipe:$/", $commandArgs)) {
+        if (preg_match("/^(recipe|r):$/", $commandArgs)) {
             static::showRecipes();
             echo "\n\n";
             exit;
         }
 
-        if (preg_match("/^recipe: -v$/", $commandArgs)) {
+        if (preg_match("/^(recipe|r): -v$/", $commandArgs)) {
             static::showRecipes($verbose=true);
             echo "\n\n";
             exit;
@@ -106,6 +106,10 @@ class InputHelp {
                 exit;
             }
             echo "\n  - " . $environmentName . ' (type:' . $environment['type'] . ')';
+
+            if (array_key_exists('comments', $environment)) {
+                echo " " . $environment['comments'];
+            }
         }
     }
 
@@ -165,21 +169,21 @@ class InputHelp {
 
     public static function showRecipes($verbose=false)
     {
-        $files = array_filter(glob('recipes/*'), 'is_file');
-        echo "\n [HELP] Available recipes:\n\n";
+        $files = array_filter(array_merge(glob('recipes/*/*'),glob('recipes/*')), 'is_file');
+        echo "\n [HELP] Available recipes:\n";
 
         foreach ($files as $file) {
             $recipe = substr($file, 8);
+            $recipeContent = file($file);
 
             if ($verbose) {
                 squaredText($recipe, $indented=1);
-                $recipeContent = file($file);
                 foreach ($recipeContent as $recipeContentLine) {
                     echo "\t\t" . $recipeContentLine;
                 }
                 echo "\n\n\n";
             } else {
-                echo "\n  - " . $recipe;
+                echo "\n  - " . $recipe . ": " . trim($recipeContent[0], "\n-");
             }
 
         }

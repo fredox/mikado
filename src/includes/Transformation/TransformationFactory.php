@@ -5,6 +5,7 @@ include_once('LazyTransformation.php');
 include_once('SchemaTransformation.php');
 include_once('KeysTransformation.php');
 include_once('DropTransformation.php');
+include_once('IgnoreTransformation.php');
 
 class TransformationFactory {
     public static function getTransformation($transformationId, $config)

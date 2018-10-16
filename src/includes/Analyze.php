@@ -38,6 +38,11 @@ class Analyze extends Health {
 
     public static function loadEnvironment($params)
     {
+        if (!array_key_exists(2, $params)) {
+            echo "\n [ERROR][ANALYZE] You must pass environment name as a second param\n\n";
+            die;
+        }
+
         $environmentName = $params[2];
 
         if (array_key_exists($environmentName, self::$config['environments'])) {

@@ -62,6 +62,7 @@ class KeyFileEnvironment implements Environment
 
             if (empty($keyRows)) {
                 echo "\n [KEY-FILE][WARNING] Empty data set [" . $index . "]";
+                $keys[] = $this->defaultValue;
                 continue;
             }
 

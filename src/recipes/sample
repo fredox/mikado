@@ -1,0 +1,6 @@
+-- This is a comment in a recipe.
+-- Recipes are used to execute more than one import data at once.
+-- It is posible to combine with key-file envs to sincornize diferent data bases.
+-- Every line of a recipe starts with the cfg command, example: cfg:sample
+-- It is posible to deifne params for recipe, it will be represented as $n, $0 the first param, $1 the second and so on.
+-- to execute a recipe use the command: php mikado recipe:recipefilename param1 param2 ...
